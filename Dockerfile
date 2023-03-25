@@ -9,7 +9,7 @@ COPY . $WORKDIR
 # Set up compiling flags for ITensor, and the shared lib path
 ENV LANG="en_US.UTF-8" \
     LANGUAGE="en_US:en" \
-    LC_ALL="en_US.UTF-8" \
+    LC_ALL="C" \
     CCCOM="g++ -m64 -std=c++17 -fconcepts -fPIC" \
     PLATFORM="lapack" \
     BLAS_LAPACK_LIBFLAGS="-lpthread -L/usr/lib -lblas -llapack" \
@@ -21,7 +21,6 @@ FROM base as runtime
 # Install cmake, lapack, blas
 RUN apt update && \
     apt-get install -y --no-install-recommends \
-    locales \
     cmake \
     ninja-build \
     # gdb \
@@ -35,8 +34,7 @@ RUN apt update && \
     iwyu \
     python3-pip
 
-RUN locale-gen en_US.UTF-8 && \
-    pip install cpplint pre-commit
+RUN pip install cpplint pre-commit
 
 # Copy external dependencies from git submodules into $PKGDIR
 COPY ext $PKGDIR
@@ -58,7 +56,7 @@ RUN cd $PKGDIR/glog && \
 
 # Install Catch2 framework for unit test
 RUN cd $PKGDIR/catch2 && \
-    cmake -Bbuild -H. -DBUILD_TESTING=OFF && \
+    cmake -B build -H. -DBUILD_TESTING=OFF && \
     cmake --build build --target install
 
 # Install trompeloeil
