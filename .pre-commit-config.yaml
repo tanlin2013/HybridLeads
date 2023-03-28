@@ -15,5 +15,6 @@ repos:
     # -   id: oclint
     # -   id: uncrustify
     -   id: cppcheck
+        args: [--suppress=missingIncludeSystem]
     -   id: cpplint
     -   id: include-what-you-use
