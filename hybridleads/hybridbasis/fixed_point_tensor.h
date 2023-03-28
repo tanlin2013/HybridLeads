@@ -107,18 +107,16 @@ class FixedPointTensor {
    * @brief Check at least one neighbouring MPO tensor is identical to uniform_site_.
    */
   void mpo_checker() {
-    int neighbour_site;
-    if (itensor::order(mpo_(uniform_site_ - 1)) ==
-        itensor::order(mpo_(uniform_site_))) {
-      neighbour_site = uniform_site_ - 1;
-    } else if (itensor::order(mpo_(uniform_site_)) == itensor::order(mpo_(uniform_site_ + 1))) {
-      neighbour_site = uniform_site_ + 1;
-    } else {
-      throw std::invalid_argument(
-          "Cannot find any neighbouring sites with same MPO tensor order."
-      );
+    int neighbour_site = 0;
+    for (int shift : {-1, 1}) {
+      if (itensor::order(mpo_(uniform_site_ + shift)) ==
+              itensor::order(mpo_(uniform_site_)) &&
+          ALLCLOSE(mpo_(uniform_site_ + shift), mpo_(uniform_site_))) {
+        neighbour_site = uniform_site_ + shift;
+        break;
+      }
     }
-    if (!ALLCLOSE(mpo_(uniform_site_), mpo_(neighbour_site))) {
+    if (neighbour_site == 0) {
       throw std::invalid_argument(
           "The `uniform site` should be picked from the bulk, with at least "
           "one neighbouring MPO tensor being identical with MPO tensor on this "
