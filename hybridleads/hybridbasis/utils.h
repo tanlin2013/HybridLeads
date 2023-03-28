@@ -1,5 +1,5 @@
-#ifndef HYDRIDBASIS_UTILS_H_
-#define HYDRIDBASIS_UTILS_H_
+#ifndef HYBRIDLEADS_HYBRIDBASIS_UTILS_H_
+#define HYBRIDLEADS_HYBRIDBASIS_UTILS_H_
 
 #include "itensor/all.h"
 
@@ -13,17 +13,17 @@
  * @throws `std::logic_error` when the order of two tensors mismatches.
  */
 bool ALLCLOSE(itensor::ITensor t1, itensor::ITensor t2, double atol = 1e-12) {
-  if (order(t1) != order(t2)) {
+  if (itensor::order(t1) != itensor::order(t2)) {
     throw std::logic_error("The order of two tensors mismatch.");
   }
   auto check_close_zero = [&atol](itensor::Real r) {
-    if (abs(r) > atol) {
+    if (std::abs(r) > atol) {
       throw std::logic_error("Two tensors are not close.");
     }
   };
   try {
-    t2.replaceInds(inds(t2), inds(t1));
-    auto diff_t = t1 - t2;
+    t2.replaceInds(itensor::inds(t2), itensor::inds(t1));
+    itensor::ITensor diff_t = t1 - t2;
     diff_t.visit(check_close_zero);  // visit() only accepts lambda func
   } catch (std::logic_error& e) {
     return false;
@@ -31,4 +31,4 @@ bool ALLCLOSE(itensor::ITensor t1, itensor::ITensor t2, double atol = 1e-12) {
   return true;
 }
 
-#endif
+#endif  // HYBRIDLEADS_HYBRIDBASIS_UTILS_H_
