@@ -12,11 +12,11 @@ repos:
     -   id: clang-format
         args: [--style=file, -i]
     -   id: clang-tidy
-        args: [-I/root/itensor, -I/root/itensor/itensor.utility]
+        args: [--, -I/root/itensor, -I/root/itensor.utility]
     # -   id: oclint
     # -   id: uncrustify
     -   id: cppcheck
-        args: [-I/root/itensor, -I/root/itensor/itensor.utility]
+        args: [-I/root/itensor, -I/root/itensor.utility]
     -   id: cpplint
         args: [--filter="-legal/copyright"]
     # -   id: include-what-you-use
