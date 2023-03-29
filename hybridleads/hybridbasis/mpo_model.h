@@ -1,7 +1,8 @@
-#ifndef HYDRIDBASIS_MPOMODEL_H_
-#define HYDRIDBASIS_MPOMODEL_H_
+#ifndef HYBRIDLEADS_HYBRIDBASIS_MPO_MODEL_H_
+#define HYBRIDLEADS_HYBRIDBASIS_MPO_MODEL_H_
 
 #include <armadillo>
+#include <tuple>
 
 #include "itensor/all.h"
 #include "kbasis/OneParticleBasis.h"
@@ -183,4 +184,4 @@ class KondoImpurity : public MPOModel {
       : MPOModel(left_size, system_size, right_size) {}
 };
 
-#endif
+#endif  // HYBRIDLEADS_HYBRIDBASIS_MPO_MODEL_H_

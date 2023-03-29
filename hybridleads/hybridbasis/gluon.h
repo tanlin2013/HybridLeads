@@ -1,5 +1,5 @@
-#ifndef HYDRIDBASIS_GLUON_H_
-#define HYDRIDBASIS_GLUON_H_
+#ifndef HYBRIDLEADS_HYBRIDBASIS_GLUON_H_
+#define HYBRIDLEADS_HYBRIDBASIS_GLUON_H_
 
 #include <armadillo>
 
@@ -77,4 +77,4 @@ class Gluon {
   FixedPointTensor left_fxpts_, right_fxpts_;
 };
 
-#endif
+#endif  // HYBRIDLEADS_HYBRIDBASIS_GLUON_H_
