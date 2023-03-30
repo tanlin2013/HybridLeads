@@ -100,7 +100,8 @@ class FixedPointTensor {
   itensor::MPO mpo_;
   int uniform_site_;
   itensor::Index mpo_left_idx_, mpo_right_idx_, phys_idx_;
-  itensor::ITensor left_fixpt_tensor_, right_fixpt_tensor_;
+  itensor::ITensor imps_left_, imps_right_, imps_left_center_, imps_center_, left_env_,
+      right_env_, left_fixpt_tensor_, right_fixpt_tensor_;
   Real en_, err_;
 
   /**
@@ -154,18 +155,18 @@ class FixedPointTensor {
     get_indices();
     auto impo = mpo_(uniform_site_);
     auto imps = ITensor();  // ill-defined tensor
-    auto
-        [imps_left, imps_right, imps_left_center, imps_center, imps_left_idty,
-         imps_right_idty] =
-            itdvp_initial(
-                impo, phys_idx_, mpo_left_idx_, mpo_right_idx_, imps, max_bond_dim,
-                ortho_tol, ortho_max_iter, seed
-            );
+    std::tie(
+        imps_left_, imps_right_, imps_left_center_, imps_center_, left_env_, right_env_
+    ) =
+        itdvp_initial(
+            impo, phys_idx_, mpo_left_idx_, mpo_right_idx_, imps, max_bond_dim,
+            ortho_tol, ortho_max_iter, seed
+        );
     itensor::Args args = {"ErrGoal=", tdvp_tol, "MaxIter", tdvp_max_iter};
     for (int i = 1; i <= time_steps; i++) {
       std::tie(en_, err_, left_fixpt_tensor_, right_fixpt_tensor_) = itdvp(
-          impo, imps_left, imps_right, imps_left_center, imps_center, imps_left_idty,
-          imps_right_idty, dt, args
+          impo, imps_left_, imps_right_, imps_left_center_, imps_center_, left_env_,
+          right_env_, dt, args
       );
       DLOG(INFO
       ) << std::printf("In time step %o, energy, error = %.3e, %.3e\n", i, en_, err_);
