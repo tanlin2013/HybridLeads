@@ -31,9 +31,9 @@ class FixedPointTensor {
    * @param seed (int), default 0.
    * @param log_to_std (bool), default true.
    * @example
-   * ```
+   * \code
    * Args itdvp_args = {"max_bond_dim", 10};
-   * ```
+   * \endcode
    * @throws `std::invalid_argument` when `uniform_site` does not give any
    * identical MPO tensors as its neighbour.
    */
