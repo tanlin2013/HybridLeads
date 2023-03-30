@@ -5,6 +5,7 @@
 
 #include <map>
 #include <string>
+#include <tuple>
 
 #include "hybridbasis/utils.h"
 #include "itdvp/iTDVP.h"
@@ -95,6 +96,17 @@ class FixedPointTensor {
    * @return int
    */
   int uniform_site() { return uniform_site_; }
+
+  /**
+   * @brief Get the unform `MPS` tensors.
+   *
+   * @return std::tuple<itensor::ITensor, itensor::ITensor, itensor::ITensor,
+   * itensor::ITensor>
+   */
+  std::tuple<itensor::ITensor, itensor::ITensor, itensor::ITensor, itensor::ITensor>
+  uniform_mps() {
+    return {imps_left_, imps_right_, imps_left_center_, imps_center_};
+  }
 
  protected:
   itensor::MPO mpo_;
