@@ -25,5 +25,19 @@
 	// "remoteUser": "vscode"
 
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home,type=bind",
-	"workspaceFolder": "/home"
+	"workspaceFolder": "/home",
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-vscode.cpptools-extension-pack",
+				"xaver.clang-format",
+				"cschlosser.doxdocgen",
+				"mhutchie.git-graph",
+				"VisualStudioExptTeam.vscodeintellicode",
+				"VisualStudioExptTeam.intellicode-api-usage-examples"
+			]
+		}
+	}
 }
