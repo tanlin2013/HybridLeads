@@ -52,6 +52,13 @@ class MPOModel {
   itensor::MPO mpo() { return itensor::toMPO(ampo_); }
 
   /**
+   * @brief Return the `MPO` instance in real-space basis.
+   *
+   * @return itensor::MPO
+   */
+  itensor::MPO real_space_mpo() { return itensor::toMPO(rs_ampo_); }
+
+  /**
    * @brief Return the single particle Hamiltonian in "standard" basis.
    * @returns arma::mat - sp_ham.
    */
@@ -66,7 +73,7 @@ class MPOModel {
  protected:
   int n_left_, n_sys_, n_right_, n_tot_;
   itensor::SiteSet sites_;
-  itensor::AutoMPO ampo_;
+  itensor::AutoMPO ampo_, rs_ampo_;
   arma::mat sp_ham_;
   arma::mat hybrid_ham_;
 
@@ -123,7 +130,11 @@ class TightBinding : public MPOModel {
     bool conserve_qns = args.getBool("ConserveQNs", false);
     sites_ = itensor::Fermion(n_tot_, {"ConserveQNs", conserve_qns});
     ampo_ = itensor::AutoMPO(sites_);
+    rs_ampo_ = itensor::AutoMPO(sites_);
+    gen_single_particle_ham();
+    basis_transformer();
     gen_auto_mpo();
+    gen_real_space_auto_mpo();
   }
 
  protected:
@@ -153,8 +164,6 @@ class TightBinding : public MPOModel {
   }
 
   void gen_auto_mpo() {
-    gen_single_particle_ham();
-    basis_transformer();
     for (int i = 0; i < n_tot_; ++i) {
       for (int j = 0; j < n_tot_; ++j) {
         double coef = hybrid_ham_(i, j);
@@ -162,6 +171,19 @@ class TightBinding : public MPOModel {
           ampo_ += coef, "N", i + 1;
         } else {
           ampo_ += coef, "Cdag", i + 1, "C", j + 1;
+        }
+      }
+    }
+  }
+
+  void gen_real_space_auto_mpo() {
+    for (int i = 0; i < n_tot_; ++i) {
+      for (int j = 0; j < n_tot_; ++j) {
+        double coef = sp_ham_(i, j);
+        if (i == j) {
+          rs_ampo_ += coef, "N", i + 1;
+        } else {
+          rs_ampo_ += coef, "Cdag", i + 1, "C", j + 1;
         }
       }
     }
