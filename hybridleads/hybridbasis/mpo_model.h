@@ -22,8 +22,8 @@ class MPOModel {
    * @note User should implement the virtual member functions in child class.
    */
   MPOModel(int left_size, int system_size, int right_size) {
-    if ((left_size < 2) || (right_size < 2)) {
-      throw std::invalid_argument("Lead size should be equal or greater than 2.");
+    if ((left_size < 4) || (right_size < 4)) {
+      throw std::invalid_argument("Lead size should be equal or greater than 4.");
     }
     n_left_ = left_size;
     n_sys_ = system_size;
