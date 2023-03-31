@@ -107,6 +107,13 @@ class FixedPointTensor {
     return {imps_left_, imps_right_, imps_center_ts_, imps_center_mat_};
   }
 
+  /**
+   * @brief Get the energy info from iTDVP routine.
+   *
+   * @return std::tuple<Real, Real>
+   */
+  std::tuple<Real, Real> get_energy_info() { return {en_, err_}; }
+
  protected:
   itensor::MPO mpo_;
   int uniform_site_;
