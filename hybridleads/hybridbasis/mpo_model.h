@@ -33,6 +33,7 @@ class MPOModel {
 
   /**
    * @brief Return the size of each block in joint system.
+   *
    * @returns std::tuple<int, int, int> (left_size, system_size, right_size).
    */
   std::tuple<int, int, int> sizes() {
@@ -41,13 +42,15 @@ class MPOModel {
 
   /**
    * @brief Return `SiteSet` of this model.
-   * @returns SiteSet
+   *
+   * @returns itensor::SiteSet
    */
   itensor::SiteSet sites() { return sites_; }
 
   /**
-   * @brief Return the `AutoMPO` instance in hybrid basis.
-   * @returns MPO
+   * @brief Return the `MPO` instance in hybrid basis.
+   *
+   * @returns itensor::MPO
    */
   itensor::MPO mpo() { return itensor::toMPO(ampo_); }
 
@@ -60,12 +63,14 @@ class MPOModel {
 
   /**
    * @brief Return the single particle Hamiltonian in "standard" basis.
+   *
    * @returns arma::mat - sp_ham.
    */
   arma::mat single_particle_ham() { return sp_ham_; }
 
   /**
    * @brief Return the single particle Hamiltonian in hybrid basis.
+   *
    * @returns arma::mat - hybrid_ham.
    */
   arma::mat hybrid_basis_ham() { return hybrid_ham_; }
@@ -96,9 +101,26 @@ class MPOModel {
     hybrid_ham_ = unitary_mat.t() * sp_ham_ * unitary_mat;
   }
 
+  /**
+   * @brief Abstract method for generating single-particle Hamiltonian.
+   *
+   * @note Please implement this method in the child class.
+   */
   virtual void gen_single_particle_ham() {}
 
+  /**
+   * @brief Abstract method for generating `AutoMPO` in hybrid basis.
+   *
+   * @note Please implement this method in the child class.
+   */
   virtual void gen_auto_mpo() {}
+
+  /**
+   * @brief Abstract method for generating `AutoMPO` in real-space basis.
+   *
+   * @note Please implement this method in the child class.
+   */
+  virtual void gen_real_space_auto_mpo() {}
 };
 
 class TightBinding : public MPOModel {
@@ -110,9 +132,20 @@ class TightBinding : public MPOModel {
    * @param system_size
    * @param right_size
    * @param args Arguments containing the model parameters with these keywords:
-   * (1) hoppings: `"t_left"`, `"t_left_sys"`, `"t_sys"`, `"t_right_sys"`,
-   * `"t_right"` (2) on-site energies: `"mu_left"`, `"mu_sys"`, `"mu_right"` (3)
-   * `"ConserveQNs"` passed to class: `ITensor::FermionSite`, default false.
+   * @param t_left (Real), default 0.
+   * @param t_left_sys (Real), default 0.
+   * @param t_sys (Real), default 0.
+   * @param t_right_sys (Real), default 0.
+   * @param t_right (Real), default 0.
+   * @param mu_left (Real), default 0.
+   * @param mu_sys (Real), default 0.
+   * @param mu_right (Real), default 0.
+   * @param ConserveQNs (bool), default false. This arg is passed to class:
+   * `ITensor::FermionSite`.
+   * @example
+   * \code
+   * Args args = {"t_left",  0.5};
+   * \endcode
    */
   TightBinding(
       int left_size, int system_size, int right_size,
