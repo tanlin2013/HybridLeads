@@ -37,11 +37,11 @@ class Gluon {
     }
     sys_mpo.ref(1).replaceInds(
         {itensor::leftLinkIndex(mpo_, left_lead_size_ + 1)},
-        {left_fxpts_.get_mpo_virtual_idx("Left")}
+        {left_fxpts_.get_mpo_virtual_idx(Left)}
     );
     sys_mpo.ref(sys_size_).replaceInds(
         {itensor::rightLinkIndex(mpo_, left_lead_size_ + sys_size_)},
-        {right_fxpts_.get_mpo_virtual_idx("Right")}
+        {right_fxpts_.get_mpo_virtual_idx(Right)}
     );
     return sys_mpo;
   }
@@ -55,20 +55,30 @@ class Gluon {
         state.set(i, "0");
     }
     itensor::MPS mps = itensor::randomMPS(state);
-    itensor::ITensor first_site_rand_ts = itensor::randomITensor(itensor::IndexSet(
-        {left_fxpts_.get_mps_virtual_idx("Left")}, itensor::inds(mps(1))
-    ));
+    itensor::ITensor first_site_rand_ts = itensor::randomITensor(
+        itensor::IndexSet(left_fxpts_.get_mps_virtual_idx(Left), itensor::inds(mps(1)))
+    );
     itensor::ITensor last_site_rand_ts = itensor::randomITensor(itensor::IndexSet(
-        itensor::inds(mps(sys_size_)), {right_fxpts_.get_mps_virtual_idx("Right")}
+        itensor::inds(mps(sys_size_)), right_fxpts_.get_mps_virtual_idx(Right)
     ));
     mps.set(1, first_site_rand_ts);
     mps.set(sys_size_, last_site_rand_ts);
     return mps;
   }
 
-  itensor::ITensor left_env() { return left_fxpts_.get("Left"); }
+  /**
+   * @brief
+   *
+   * @return itensor::ITensor
+   */
+  itensor::ITensor left_env() { return left_fxpts_.get(Left); }
 
-  itensor::ITensor right_env() { return right_fxpts_.get("Right"); }
+  /**
+   * @brief
+   *
+   * @return itensor::ITensor
+   */
+  itensor::ITensor right_env() { return right_fxpts_.get(Right); }
 
  protected:
   itensor::MPO mpo_;
