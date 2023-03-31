@@ -105,15 +105,15 @@ class FixedPointTensor {
    */
   std::tuple<itensor::ITensor, itensor::ITensor, itensor::ITensor, itensor::ITensor>
   uniform_mps() {
-    return {imps_left_, imps_right_, imps_left_center_, imps_center_};
+    return {imps_left_, imps_right_, imps_center_ts_, imps_center_mat_};
   }
 
  protected:
   itensor::MPO mpo_;
   int uniform_site_;
   itensor::Index mpo_left_idx_, mpo_right_idx_, phys_idx_;
-  itensor::ITensor imps_left_, imps_right_, imps_left_center_, imps_center_, left_env_,
-      right_env_, left_fixpt_tensor_, right_fixpt_tensor_;
+  itensor::ITensor imps_left_, imps_right_, imps_center_ts_, imps_center_mat_,
+      left_env_, right_env_, left_fixpt_tensor_, right_fixpt_tensor_;
   Real en_, err_;
 
   /**
@@ -168,7 +168,8 @@ class FixedPointTensor {
     auto impo = mpo_(uniform_site_);
     auto imps = ITensor();  // ill-defined tensor
     std::tie(
-        imps_left_, imps_right_, imps_left_center_, imps_center_, left_env_, right_env_
+        imps_left_, imps_right_, imps_center_ts_, imps_center_mat_, left_env_,
+        right_env_
     ) =
         itdvp_initial(
             impo, phys_idx_, mpo_left_idx_, mpo_right_idx_, imps, max_bond_dim,
@@ -177,7 +178,7 @@ class FixedPointTensor {
     itensor::Args args = {"ErrGoal=", tdvp_tol, "MaxIter", tdvp_max_iter};
     for (int i = 1; i <= time_steps; i++) {
       std::tie(en_, err_, left_fixpt_tensor_, right_fixpt_tensor_) = itdvp(
-          impo, imps_left_, imps_right_, imps_left_center_, imps_center_, left_env_,
+          impo, imps_left_, imps_right_, imps_center_ts_, imps_center_mat_, left_env_,
           right_env_, dt, args
       );
       DLOG(INFO
