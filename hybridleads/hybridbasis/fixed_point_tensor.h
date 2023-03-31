@@ -30,7 +30,6 @@ class FixedPointTensor {
    * @param ortho_tol (Real), default 1e-12.
    * @param ortho_max_iter (int), , default 20.
    * @param seed (int), default 0.
-   * @param log_to_std (bool), default true.
    * @example
    * \code
    * Args itdvp_args = {"max_bond_dim", 10};
