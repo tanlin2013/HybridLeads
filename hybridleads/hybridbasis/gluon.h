@@ -23,6 +23,9 @@ class Gluon {
     left_lead_size_ = left_lead_size;
     right_lead_size_ = right_lead_size;
     sys_size_ = itensor::length(sites_);
+    if (sys_size_ < 2) {
+      throw std::invalid_argument("System (bulk) size should be at least 2.");
+    }
     if (left_lead_size_ + sys_size_ + right_lead_size_ != itensor::length(mpo_)) {
       throw std::invalid_argument("Total size does not match with the given MPO.");
     }
