@@ -87,7 +87,7 @@ class MPOModel {
    * basis.
    */
   void basis_transformer() {
-    if (std::abs(arma::det(sp_ham_)) < 1e-14) {
+    if (arma::rank(sp_ham_) < n_tot_) {
       throw std::runtime_error("The single particle Hamiltonian is probably singular.");
     }
     arma::vec evals;
