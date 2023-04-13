@@ -24,7 +24,7 @@ class FixedPointTensor {
    * tensor in adjacent.
    * @param args Arguments containing the iTDVP parameters with these keywords:
    * @param time_steps (int), default 30.
-   * @param dt (Real), default 1e-12.
+   * @param dt (Real), default `INFINITY`.
    * @param tdvp_tol (Real), default 1e-12.
    * @param tdvp_max_iter (int), default 40.
    * @param max_bond_dim (int), default 1.
@@ -46,7 +46,7 @@ class FixedPointTensor {
     uniform_site_ = uniform_site;
     mpo_checker();
     int time_steps = args.getInt("time_steps", 30);
-    Real dt = args.getReal("dt", 1e-12);
+    Real dt = args.getReal("dt", INFINITY);
     int max_bond_dim = args.getInt("max_bond_dim", 1);
     Real tdvp_tol = args.getReal("tdvp_tol", 1e-12);
     int tdvp_max_iter = args.getInt("tdvp_max_iter", 40);
