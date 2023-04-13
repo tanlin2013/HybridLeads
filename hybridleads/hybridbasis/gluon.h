@@ -2,6 +2,7 @@
 #define HYBRIDLEADS_HYBRIDBASIS_GLUON_H_
 
 #include <armadillo>
+#include <tuple>
 
 #include "hybridbasis/fixed_point_tensor.h"
 #include "itensor/all.h"
@@ -86,6 +87,21 @@ class Gluon {
    * @return itensor::ITensor
    */
   itensor::ITensor right_env() { return right_fxpts_.get(Right); }
+
+  /**
+   * @brief
+   *
+   * @param init_state
+   * @param sweeps
+   * @param args
+   * @return std::tuple<Real, itensor::MPS>
+   */
+  std::tuple<Real, itensor::MPS> dmrg(
+      itensor::MPS const& init_state, itensor::Sweeps const& sweeps,
+      itensor::Args const& args = itensor::Args::global()
+  ) {
+    return itensor::dmrg(sys_mpo(), init_state, sweeps, args);
+  }
 
  protected:
   itensor::MPO mpo_;
