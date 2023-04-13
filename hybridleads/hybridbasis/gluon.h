@@ -6,6 +6,10 @@
 #include "hybridbasis/fixed_point_tensor.h"
 #include "itensor/all.h"
 
+using Real = itensor::Real;
+using Index = itensor::Index;
+using IndexSet = itensor::IndexSet;
+
 class Gluon {
  public:
   Gluon(
@@ -29,7 +33,7 @@ class Gluon {
   itensor::MPO sys_mpo() {
     itensor::MPO sys_mpo(sites_);
     for (int site = 1; site <= sys_size_; ++site) {
-      itensor::IndexSet new_site_inds = itensor::siteInds(sys_mpo, site);
+      IndexSet new_site_inds = itensor::siteInds(sys_mpo, site);
       sys_mpo.ref(site) = mpo_(left_lead_size_ + site);
       sys_mpo.ref(site).replaceInds(
           itensor::siteInds(mpo_, left_lead_size_ + site), new_site_inds
@@ -48,7 +52,7 @@ class Gluon {
 
   itensor::MPS random_init_state() {
     itensor::InitState state(sites_);
-    for (int i : range1(sys_size_)) {
+    for (int i : itensor::range1(sys_size_)) {
       if (i % 2 == 1)
         state.set(i, "1");
       else
@@ -56,11 +60,11 @@ class Gluon {
     }
     itensor::MPS mps = itensor::randomMPS(state);
     itensor::ITensor first_site_rand_ts = itensor::randomITensor(
-        itensor::IndexSet(left_fxpts_.get_mps_virtual_idx(Left), itensor::inds(mps(1)))
+        IndexSet(left_fxpts_.get_mps_virtual_idx(Left), itensor::inds(mps(1)))
     );
-    itensor::ITensor last_site_rand_ts = itensor::randomITensor(itensor::IndexSet(
-        itensor::inds(mps(sys_size_)), right_fxpts_.get_mps_virtual_idx(Right)
-    ));
+    itensor::ITensor last_site_rand_ts = itensor::randomITensor(
+        IndexSet(itensor::inds(mps(sys_size_)), right_fxpts_.get_mps_virtual_idx(Right))
+    );
     mps.set(1, first_site_rand_ts);
     mps.set(sys_size_, last_site_rand_ts);
     return mps;
