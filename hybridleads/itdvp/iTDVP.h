@@ -1,7 +1,8 @@
-#ifndef __ITDVP_H_CMC__
-#define __ITDVP_H_CMC__
+#ifndef HYBRIDLEADS_ITDVP_ITDVP_H_
+#define HYBRIDLEADS_ITDVP_ITDVP_H_
 
 #include <iomanip>
+#include <tuple>
 #include <typeinfo>
 
 #include "FixedPointTensor.h"
@@ -10,8 +11,9 @@
 #include "itensor/all.h"
 #include "uGauge.h"
 
-using namespace itensor;
-using namespace std;
+using Real = itensor::Real;
+using ITensor = itensor::ITensor;
+using INdex = itensor::Index;
 
 /**
  * @brief Randomly initialize iMPS in the mixed canonical form.
@@ -38,9 +40,10 @@ using namespace std;
  *
  * @see https://scipost.org/SciPostPhysLectNotes.7
  */
-tuple<ITensor, ITensor, ITensor, ITensor, ITensor, ITensor> itdvp_initial(
-    const ITensor& W, const Index& is, const Index& iwl, const Index& iwr,
-    ITensor& A, int D, Real ErrGoal, int MaxIter, RandGen::SeedType seed = 0) {
+std::tuple<ITensor, ITensor, ITensor, ITensor, ITensor, ITensor> itdvp_initial(
+    const ITensor& W, const Index& is, const Index& iwl, const Index& iwr, ITensor& A,
+    int D, Real ErrGoal, int MaxIter, RandGen::SeedType seed = 0
+) {
   Index il;
   if (!A) {
     il = Index(D, "Link");
@@ -53,8 +56,8 @@ tuple<ITensor, ITensor, ITensor, ITensor, ITensor, ITensor> itdvp_initial(
   } else {
     il = findIndex(A, "Link,0");
     if (!hasIndex(A, prime(il, 2))) {
-      cout << "Error: " << __FUNCTION__ << ": A has wrong index structure"
-           << endl;
+      std::cout << "Error: " << __FUNCTION__ << ": A has wrong index structure"
+                << std::endl;
       throw;
     }
   }
@@ -80,8 +83,7 @@ tuple<ITensor, ITensor, ITensor, ITensor, ITensor, ITensor> itdvp_initial(
  * @param AC
  * @return Real
  */
-inline Real diff_ALC_AC(const ITensor& AL, const ITensor& C,
-                        const ITensor& AC) {
+inline Real diff_ALC_AC(const ITensor& AL, const ITensor& C, const ITensor& AC) {
   auto ALC = get_AC(AL, C);
   auto d = norm(ALC - AC);
   return d;
@@ -92,10 +94,10 @@ inline Real diff_ALC_AC(const ITensor& AL, const ITensor& C,
  *
  * @tparam TimeType
  * @param W The uniform MPO tensor.
- * @param AL Left-normalized iMPS tensor in the mixed canonical form.
- * @param AR Right-normalized iMPS tensor in the mixed canonical form.
- * @param AC The center site tensor, `AL` @f$\times@f$ `C`.
- * @param C The center matrix of iMPS in the mixed canonical form.
+ * @param[in, out] AL Left-normalized iMPS tensor in the mixed canonical form.
+ * @param[in, out] AR Right-normalized iMPS tensor in the mixed canonical form.
+ * @param[in, out] AC The center site tensor, `AL` @f$\times@f$ `C`.
+ * @param[in, out] C The center matrix of iMPS in the mixed canonical form.
  * @param La0 Left fixed-point tensor of initial iMPS `A`.
  * @param Ra0 Right fixed-point tensor of initial iMPS `A`.
  * @param dt Length of time step. If `dt` is real, imaginary time evolution will
@@ -112,11 +114,10 @@ inline Real diff_ALC_AC(const ITensor& AL, const ITensor& C,
  * @see https://scipost.org/SciPostPhysLectNotes.7
  */
 template <typename TimeType>
-tuple<Real, Real, ITensor, ITensor> itdvp(const ITensor& W, ITensor& AL,
-                                          ITensor& AR, ITensor& AC, ITensor& C,
-                                          ITensor& La0, ITensor& Ra0,
-                                          TimeType dt,
-                                          Args& args = Args::global()) {
+std::tuple<Real, Real, ITensor, ITensor> itdvp(
+    const ITensor& W, ITensor& AL, ITensor& AR, ITensor& AC, ITensor& C, ITensor& La0,
+    ITensor& Ra0, TimeType dt, Args& args = Args::global()
+) {
   // C --> L, R
   auto L = get_LR<LEFT>(C);
   auto R = get_LR<RIGHT>(C);
@@ -149,4 +150,4 @@ tuple<Real, Real, ITensor, ITensor> itdvp(const ITensor& W, ITensor& AL,
   return {en, err, LW, RW};
 }
 
-#endif
+#endif  // HYBRIDLEADS_ITDVP_ITDVP_H_
