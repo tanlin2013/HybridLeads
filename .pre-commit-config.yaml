@@ -16,12 +16,5 @@ repos:
     # -   id: uncrustify
     # -   id: cppcheck
     -   id: cpplint
-        args: [
-            "--filter=-legal/copyright,
-            -whitespace/parens,
-            -whitespace/line_length,
-            -build/include_order,
-            -readability/check",
-            -runtime/references
-        ]
+        args: ["--filter=-legal/copyright, -whitespace/parens, -whitespace/line_length, -build/include_order, -readability/check", -runtime/references]
     # -   id: include-what-you-use
