@@ -75,6 +75,58 @@ class Gluon {
   }
 
   /**
+   * @brief Generate an initial uniform MPS from leads.
+   *
+   * @param take_from_side Take the uniform MPS from which side of lead.
+   * @param ortho_center The orthogonal center of MPS in mixed-canonical form.
+   * @return itensor::MPS
+   */
+  itensor::MPS uniform_state(Side take_from_side, int ortho_center) {
+    itensor::ITensor imps_left, imps_right, imps_center_ts, imps_center_mat;
+    if (take_from_side == Left) {
+      std::tie(imps_left, imps_right, imps_center_ts, imps_center_mat) =
+          left_fxpts_.uniform_mps();
+    } else if (take_from_side == Right) {
+      std::tie(imps_left, imps_right, imps_center_ts, imps_center_mat) =
+          right_fxpts_.uniform_mps();
+    }
+    if (ortho_center < 1 || ortho_center > sys_size_) {
+      throw std::invalid_argument(
+          "The orthogonal center should be within the range of system size."
+      );
+    }
+    itensor::MPS mps = itensor::MPS(sites_);
+    Index new_virtual_left_idx = left_fxpts_.get_mps_virtual_idx(Left);
+    for (int site : itensor::range1(sys_size_)) {
+      Index new_phys_idx = itensor::findIndex(itensor::inds(mps(site)), "Site");
+      if (site < ortho_center) {
+        mps.ref(site) = imps_left;
+      } else if (site == ortho_center) {
+        mps.ref(site) = imps_center_ts;
+      } else if (site > ortho_center) {
+        mps.ref(site) = imps_right;
+      }
+      IndexSet old_virtual_inds = itensor::findInds(itensor::inds(mps(site)), "Link");
+      Index old_phys_idx = itensor::findIndex(itensor::inds(mps(site)), "Site");
+      Index new_virtual_right_idx = Index(itensor::dim(old_virtual_inds(2)), "Link");
+      mps.ref(site).replaceInds(
+          IndexSet(old_phys_idx, old_virtual_inds(1), old_virtual_inds(2)),
+          IndexSet(new_phys_idx, new_virtual_left_idx, new_virtual_right_idx)
+      );
+      new_virtual_left_idx = new_virtual_right_idx;
+    }
+    mps.ref(1).replaceInds(
+        {itensor::findInds(itensor::inds(mps(1)), "Link")(1)},
+        {left_fxpts_.get_mps_virtual_idx(Left)}
+    );
+    mps.ref(sys_size_).replaceInds(
+        {itensor::findInds(itensor::inds(mps(sys_size_)), "Link")(2)},
+        {right_fxpts_.get_mps_virtual_idx(Right)}
+    );
+    return mps;
+  }
+
+  /**
    * @brief
    *
    * @return itensor::ITensor

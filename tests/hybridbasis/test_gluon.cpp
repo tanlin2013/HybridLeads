@@ -10,8 +10,8 @@
 #include "hybridbasis/mpo_model.h"
 #include "hybridbasis/utils.h"
 
-using namespace itensor;
-using namespace Catch;
+using namespace itensor;  // NOLINT
+using namespace Catch;    // NOLINT
 
 TEST_CASE("Check gluon indices", "[TestCommonInds]") {
   int n_left = 4;
@@ -30,20 +30,34 @@ TEST_CASE("Check gluon indices", "[TestCommonInds]") {
   auto sys_mpo = gluon.sys_mpo();
   auto left_env = gluon.left_env();
   auto right_env = gluon.right_env();
-  auto init_state = gluon.random_init_state();
+  auto rand_init_state = gluon.random_init_state();
+  auto uni_init_state = gluon.uniform_state(Left, n_sys / 2);
 
   CHECK(order(sys_mpo(1)) == 4);
   CHECK(order(sys_mpo(length(sites))) == 4);
-  CHECK(order(init_state(1)) == 3);
-  CHECK(order(init_state(length(sites))) == 3);
+  CHECK(order(rand_init_state(1)) == 3);
+  CHECK(order(rand_init_state(length(sites))) == 3);
+  for (int site : itensor::range1(length(sites))) {
+    CHECK(order(uni_init_state(site)) == 3);
+  }
 
-  std::list<IndexSet> indices = {
-      commonInds(sys_mpo(1), left_env), commonInds(sys_mpo(length(sites)), right_env),
-      commonInds(init_state(1), left_env),
-      commonInds(init_state(length(sites)), right_env)};
+  std::list<IndexSet> virtual_indices = {
+      commonInds(sys_mpo(1), left_env),
+      commonInds(sys_mpo(length(sites)), right_env),
+      commonInds(rand_init_state(1), left_env),
+      commonInds(rand_init_state(length(sites)), right_env),
+      commonInds(uni_init_state(1), left_env),
+      commonInds(uni_init_state(length(sites)), right_env),
+  };
 
-  for (IndexSet idx : indices) {
+  for (IndexSet idx : virtual_indices) {
     CHECK(length(idx) == 1);
     CHECK(hasTags(idx(1), "Link"));
+  }
+
+  for (int site : itensor::range1(length(sites))) {
+    IndexSet phys_inds = commonInds(sys_mpo(site), uni_init_state(site));
+    CHECK(length(phys_inds) == 1);
+    CHECK(hasTags(phys_inds(1), "Site"));
   }
 }
