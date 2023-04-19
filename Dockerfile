@@ -1,4 +1,4 @@
-FROM gcc:12.2 as base
+FROM ubuntu:22.04 as base
 LABEL maintainer="ChiaMin chiaminchung@gmail.com, TaoLin tanlin2013@gmail.com"
 
 ARG WORKDIR=/home
@@ -21,6 +21,8 @@ FROM base as runtime
 # Install cmake, lapack, blas
 RUN apt update && \
     apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
     cmake \
     ninja-build \
     # gdb \
