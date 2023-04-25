@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Unittest LANGUAGES CXX)
 enable_testing()
+set(CMAKE_CXX_COMPILER /usr/bin/c++)
 set(ITENSOR_DIR "/root/itensor")
 
 # Include module headers
