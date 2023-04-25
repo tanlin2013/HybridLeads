@@ -61,3 +61,66 @@ TEST_CASE("Check gluon indices", "[TestCommonInds]") {
     CHECK(hasTags(phys_inds(1), "Site"));
   }
 }
+
+TEST_CASE("Compare ground state energy density", "[TestEnergyDensity]") {
+  int n_left = 4;
+  int n_sys = GENERATE(20, 40, 60, 80, 100, 120, 140, 160, 180, 200);
+  int n_right = n_left;
+  int n_tot = n_left + n_sys + n_right;
+  Args model_args = {"t_left",      1.0, "t_left_sys", 1.0, "t_sys",       1.0,
+                     "t_right_sys", 1.0, "t_right",    1.0, "mu_left",     0.0,
+                     "mu_sys",      0.0, "mu_right",   0.0, "ConserveQNs", false};
+  TightBinding model(n_left, n_sys, n_right, model_args);
+  Args itdvp_args = {"dt", INFINITY, "max_bond_dim", 64};
+  auto sites = Fermion(n_sys + 2, {"ConserveQNs", false});
+  Gluon gluon(model.mpo(), sites, n_left - 1, n_right - 1, itdvp_args);
+
+  // auto state = InitState(model.sites());
+  // for (auto i : range1(n_tot)) {
+  //   if (i % 2 == 1)
+  //     state.set(i, "1");
+  //   else
+  //     state.set(i, "0");
+  // }
+  // auto psi0 = randomMPS(state);
+
+  auto sweeps = Sweeps(60);
+  sweeps.maxdim() = 10, 20, 100, 200, 200;
+  sweeps.cutoff() = 1E-8;
+  auto [energy, psi] = dmrg(
+      gluon.sys_mpo(), gluon.left_env(), gluon.right_env(),
+      gluon.uniform_state(Left, length(model.sites()) / 2), sweeps, {"Silent", true}
+  );
+  // auto [expected_energy, expected_psi] =
+  //     dmrg(model.mpo(), psi0, sweeps, {"Silent", true});
+
+  // std::cout << energy / (n_sys + 2) << ", " << n_sys + 2 << ", "
+  //           << expected_energy / n_tot << ", " << n_tot << std::endl;
+  //   CHECK_THAT(energy, Matchers::WithinAbs(expected_energy, 1e-6));
+
+  // int center_site = length(model.sites()) / 2;
+  // psi.position(center_site);
+  // PrintData(psi);
+
+  // auto l = leftLinkIndex(psi, center_site);
+  // auto s = siteIndex(psi, center_site);
+  // auto [U,S,V] = svd(psi(center_site),{l,s});
+  // auto u = commonIndex(U,S);
+
+  // Real entropy = 0.;
+  // for(auto n : range1(dim(u))) {
+  //   auto Sn = elt(S,n,n);
+  //   auto p = sqr(Sn);
+  //   if(p > 1E-12) entropy += -p*log(p);
+  // }
+
+  // file pointer
+  fstream fout;
+  // opens an existing csv file or creates a new file.
+  fout.open("data.csv", ios::out | ios::app);
+
+  for (int site : range1(n_sys + 2 - 1)) {
+    int bond_dim = dim(rightLinkIndex(psi, site));
+    fout << n_sys + 2 << ", " << site << ", " << bond_dim << "\n";
+  }
+}
