@@ -152,7 +152,7 @@ class Gluon {
       itensor::MPS const& init_state, itensor::Sweeps const& sweeps,
       itensor::Args const& args = itensor::Args::global()
   ) {
-    return itensor::dmrg(sys_mpo(), init_state, sweeps, args);
+    return itensor::dmrg(sys_mpo(), left_env(), right_env(), init_state, sweeps, args);
   }
 
  protected:
