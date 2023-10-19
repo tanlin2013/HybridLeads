@@ -12,7 +12,7 @@ jobs:
     container:
       image: ghcr.io/${{ github.actor }}/hybridleads:latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up building directory
         run: |
