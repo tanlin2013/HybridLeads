@@ -1,7 +1,7 @@
 [submodule "ext/itensor"]
 	path = ext/itensor
 	url = https://github.com/ITensor/ITensor.git
-	branch = v3.1.11
+	branch = v3.2.0
 [submodule "ext/itensor.utility"]
 	path = ext/itensor.utility
 	url = https://github.com/chiamin/itensor.utility.git
